@@ -99,6 +99,25 @@ closeButton.onclick = ()=> {
 }
 
 window.catex.featureLayer = {
+    onMultiFeatureSelect: [
+        {
+            label: "Merge properties",
+            title: "Merge properties",
+            action: function(o, callback) {
+                if (typeof callback === "function") {
+                    if (o.features) {
+                        if (o.features.length===2) {
+                            const newProperties = {
+                                a:{...o.features[0].properties}, 
+                                b:{...o.features[1].properties}, 
+                            }
+                            callback(newProperties)
+                        }
+                    }                    
+                }
+            } 
+        },
+    ],
     onFeatureSelect: [
         {
             label: "Double population of 1990",
@@ -171,7 +190,26 @@ window.catex.featureLayer = {
      }
 }
 
-window.catex.ogc3dtiles = {
+window.catex.ogc3dTiles = {
+    onMultiFeatureSelect:[
+        {
+            label: "Merge properties",
+            title: "Merge properties",
+            action: function(o, callback) {
+                if (typeof callback === "function") {
+                    if (o.features) {
+                        if (o.features.length===2) {
+                            const newProperties = {
+                                a:{...o.features[0].properties}, 
+                                b:{...o.features[1].properties}, 
+                            }
+                            callback(newProperties)
+                        }
+                    }                    
+                }
+            } 
+        },
+    ],
     onFeatureSelect: [
         {
             label: "Say Hello",

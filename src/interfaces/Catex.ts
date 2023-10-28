@@ -52,6 +52,12 @@ interface MenuEntryFeatureSelect {
     action: (parameters: {feature: any; model: any; layer: any;}, callback: (properties: {[key: string]: any})=>void) => void;
 }
 
+interface MenuEntryMultiFeatureSelect {
+    label: string;
+    title: string;
+    action: (parameters: {features: any[]; model: any; layer: any;}, callback: (properties: {[key: string]: any})=>void) => void;
+}
+
 export interface Catex {
     app?: {
         getUserInfo?:() => Promise<any>;
@@ -64,10 +70,12 @@ export interface Catex {
     };
     featureLayer?: {
         onFeatureSelect?: MenuEntryFeatureSelect[];
+        onMultiFeatureSelect?: MenuEntryMultiFeatureSelect[];
         onRender?: (layer: any, feature: any, style: any, map: any, paintState: any) => void;
     };
-    ogc3dtiles?: {
+    ogc3dTiles?: {
         onFeatureSelect?: MenuEntryFeatureSelect[]
+        onMultiFeatureSelect?: MenuEntryMultiFeatureSelect[]
     };
     data?: {
         transformers?: CatexCompanionDataTransformer[]
