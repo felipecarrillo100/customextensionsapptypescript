@@ -53,28 +53,37 @@ interface MenuEntryFeatureSelect {
 }
 
 export interface Catex {
-    app: {
-        onAppReady: () => void;
-        navbarActions: NavBarEntryCustomActions[];
-        webservices: NavBarEntryWebservice[];
+    app?: {
+        getUserInfo?:() => Promise<any>;
+        onAppReady?: () => void;
+        navbarActions?: NavBarEntryCustomActions[];
+        webservices?: NavBarEntryWebservice[];
     };
-    workspace: {
-        emitCommand: (command: any) => void;
+    workspace?: {
+        emitCommand?: (command: any) => void;
     };
-    featureLayer: {
-        onFeatureSelect: MenuEntryFeatureSelect[];
-        onRender: (layer: any, feature: any, style: any, map: any, paintState: any) => void;
+    featureLayer?: {
+        onFeatureSelect?: MenuEntryFeatureSelect[];
+        onRender?: (layer: any, feature: any, style: any, map: any, paintState: any) => void;
     };
-    ogc3dtiles: {
-        onFeatureSelect: MenuEntryFeatureSelect[]
+    ogc3dtiles?: {
+        onFeatureSelect?: MenuEntryFeatureSelect[]
     };
-    data: {
-        transformers: CatexCompanionDataTransformer[]
-    }
-    map: {
-       onMouseClick: onMouseClickEvent[],
-       onMapMove: onMapMoveEvent[],
-       onMousePoint: onMousePointEvent[]
+    data?: {
+        transformers?: CatexCompanionDataTransformer[]
+    };
+    map?: {
+       deleteLayerByID?: (id:string) => void;
+       getMainMap?: () => any;
+       onMouseClick?: onMouseClickEvent[],
+       onMapMove?: onMapMoveEvent[],
+       onMousePoint?: onMousePointEvent[]
+    };
+    utils?: {
+        boundingBox: (shape: any) => number[];
+        pointToArray: (point: any) => number[];
+        shapeToGeoJSON: (shape: any) => any;
+        featureToGeoJSON: (feature: any) => any;
     }
 }
 

@@ -13,16 +13,22 @@ module.exports = (env, argv) => {
     const isDevelopment = mode !== 'production' && mode !== 'test';
 
     return {
-        entry: ['./src/index.tsx'],
+        entry: ['./src/index.ts'],
         output: {
             path: path.resolve(__dirname, 'dist/customextensions'),
             filename: 'index.js',
             chunkFilename: '[name].chunk.js',
         },
-        devtool: 'source-map',
+        //devtool: 'source-map',
+        devtool: isDevelopment ? 'source-map' : undefined,
         devServer: {
-            port: 4000,
+            port: 5000,
             open: true,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Methods": "GET, POST, PUT, DELETE, PATCH, OPTIONS",
+                "Access-Control-Allow-Headers": "X-Requested-With, content-type, Authorization"
+              }
         },
         module: {
             rules: [
@@ -41,7 +47,8 @@ module.exports = (env, argv) => {
                     // CSS Loader
                     test: /\.css$/,
                     use: [
-                        { loader: isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader },
+                        // { loader: isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader },
+                        { loader:  MiniCssExtractPlugin.loader },
                         { loader: 'css-loader' },
                     ],
                 },
@@ -49,7 +56,8 @@ module.exports = (env, argv) => {
                     // SCSS (SASS) Loader
                     test: /\.s[ac]ss$/i,
                     use: [
-                        { loader: isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader },
+                        // { loader: isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader },
+                        { loader:  MiniCssExtractPlugin.loader },
                         { loader: 'css-loader' },
                         { loader: 'sass-loader' },
                     ],
@@ -58,7 +66,8 @@ module.exports = (env, argv) => {
                     // Less loader
                     test: /\.less$/,
                     use: [
-                        { loader: isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader },
+                        // { loader: isDevelopment ? 'style-loader' : MiniCssExtractPlugin.loader },
+                        { loader:  MiniCssExtractPlugin.loader },
                         { loader: 'css-loader' },
                         { loader: 'less-loader' },
                     ],

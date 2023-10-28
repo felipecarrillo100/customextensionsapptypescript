@@ -1,12 +1,12 @@
 import { Catex } from "./interfaces/Catex";
 import "./styles/index.scss"
 
+/*******************************/
 const elementCompanion = document.getElementById("document-companion");
 elementCompanion.classList.add("intro-panel");
 elementCompanion.classList.add("make-invisible");
 
-
-window.catex = {} as Catex;
+window.catex = {}
 
 window.catex.app = {
     onAppReady: () => {
@@ -26,11 +26,13 @@ window.catex.app = {
             }
         },       
         {
-            id: "navac-2",
-            label: "Execute Hello World",
+            id: "navac-2.1",
+            label: "Say Hello to me",
             title: "Trigger an action",
             action: function(o, callback) {
-                console.log("Hello world!!!!");
+                window.catex.app.getUserInfo().then((user)=>{
+                    alert(`Hello user ${user.username}`);
+                });
                 callback();
             }
         },
@@ -54,6 +56,16 @@ window.catex.app = {
                 callback();
             }
         },
+        {
+            id: "navac-5",
+            label: "Remove Grid Layer",
+            title: "Trigger an action",
+            action: function(o, callback) {
+                console.log(window.catex.map.getMainMap());
+                window.catex.map.deleteLayerByID("Grid")
+                callback();
+            }
+        },        
     ],
     webservices: [
         {
@@ -66,25 +78,7 @@ window.catex.app = {
                     callback(results);
                 }
             }
-        },
-        {
-            id: "cs2-id",
-            label: "My company Data",
-            title: "A custom services that provides a list of services from REST API",
-            action: function(params, callback) {
-                if (typeof callback === "function") {
-                    var queryString = Object.keys(params).map(key => key + '=' + (params as any)[key]).join('&');
-                    fetch(`http://localhost:5000/api/catalog?${queryString}`)
-                    .then(response => response.json())
-                    .then(jsonData => {
-                        callback(jsonData);
-                        })
-                    .catch(()=>{
-                        callback(null);
-                    })     
-                }
-            }
-        }
+        }        
     ] 
 }
 
@@ -105,6 +99,36 @@ closeButton.onclick = ()=> {
 }
 
 window.catex.featureLayer = {
+    onFeatureSelect: [
+        {
+            label: "Double population of 1990",
+            title: "Modify properties",
+            action: function(o, callback) {
+                if (typeof callback === "function") {
+                    if (o.feature.properties.POP1990) {
+                        const newProperties = {...o.feature.properties, 
+                            'POP1990x2': Number(o.feature.properties.POP1990) * 2
+                        }
+                        callback(newProperties)
+                    }                    
+                }
+            } 
+        },
+        {
+            label: "Get Dog from Rest API",
+            title: "Fetch random image from rest API",
+            action: function(o, callback) {
+                fetch(`http://localhost:5000/api/images/${o.feature.id}`)
+                .then(response => response.json())
+                .then(jsonData => {
+                      callback({
+                        ...o.feature.properties, 
+                        IMAGE: jsonData.message
+                    })
+                    })            
+            } 
+        }
+    ],
     onRender: (layer, feature, style, map, paintState) =>{
         const val = feature.properties.POP1996;
         if (!val) return style;
@@ -125,14 +149,14 @@ window.catex.featureLayer = {
              g = value;
              b = 0;
          } else if(val < R2) {
-             var perc = (R2-val)/(R2-R1);
-             var value = Math.round(255*perc);
+             const perc = (R2-val)/(R2-R1);
+             const value = Math.round(255*perc);
              r = value;
              g = 255;
              b = 0;       
          } else if(val < R3) {
-             var perc = (R3-val)/(R3-R2);
-             var value = Math.round(255*perc);
+             const perc = (R3-val)/(R3-R2);
+             const value = Math.round(255*perc);
              r = 0;
              g = value;
              b = 255;     
@@ -144,38 +168,7 @@ window.catex.featureLayer = {
         }    
         clone.shapeStyle.fill.color = color;
         return clone;
-     },     
-    onFeatureSelect: [
-        {
-            label: "Double population of 1990",
-            title: "Modify properties",
-            action: function(o: any, callback: any) {
-                if (typeof callback === "function") {
-                    if (o.feature.properties.POP1990) {
-                        const newProperties = {...o.feature.properties, 
-                            'POP1990x2': Number(o.feature.properties.POP1990) * 2
-                        }
-                        callback(newProperties)
-                    }                    
-                }
-            } 
-        },
-        {
-            label: "Get Dog from Rest API",
-            title: "Fetch random image from rest API",
-            action: function(o: any, callback: any) {
-                fetch(`http://localhost:5000/api/images/${o.feature.id}`)
-                .then(response => response.json())
-                .then(jsonData => {
-                      callback({
-                        ...o.feature.properties, 
-                        IMAGE: jsonData.message,
-                        VIDEO: 'https://www.youtube.com/watch?v=VAH-ixdFWFs'
-                    })
-                    })            
-            } 
-        }
-    ]
+     }
 }
 
 window.catex.ogc3dtiles = {
@@ -183,7 +176,7 @@ window.catex.ogc3dtiles = {
         {
             label: "Say Hello",
             title: "Modify properties",
-            action: function(o:any, callback: any) {
+            action: function(o, callback) {
                 if (typeof callback === "function") {
                     const newProperties = {...o.feature.properties, 
                     greeting: "Hello to Eddie from catexextensions"
@@ -205,14 +198,14 @@ window.catex.ogc3dtiles = {
         {
             label: "Print to console",
             title: "Send info to console",
-            action: function(o: any, callback: any) {
+            action: function(o, callback) {
                 console.log(o)
             } 
         },
         {
             label: "Fetch from API",
             title: "Fetch from a test API",
-            action: function(o: any, callback:any) {
+            action: function(o, callback) {
                 fetch('https://httpbin.org/json')
                 .then(response => response.json())
                 .then(json => {
@@ -226,6 +219,18 @@ window.catex.ogc3dtiles = {
 
 window.catex.data = {
     transformers: [
+        {
+            name: "Custom API",
+            extensions: "json",
+            transform: (dataStr:string) => {
+                const dataArray = JSON.parse(dataStr);
+                const geojsonArray = dataArray.map((row:any)=>{
+                    const {id, geom, ...properties} = row;
+                    return {id, type:"Feature", geometry: geom, properties }
+                });
+                return JSON.stringify(geojsonArray);
+            }
+        },
         {
             name: "CSV",
             extensions: "csv, txt",
@@ -270,20 +275,26 @@ window.catex.map = {
         {
             action: function(o, callback) {
                 console.log("Mouse click on map:", o);
+                console.log("Mouse click on map at:", window.catex.utils.pointToArray(o.point));
+                if (o.feature) {
+                    console.log("Feature:", window.catex.utils.shapeToGeoJSON(o.feature.shape));
+                }
             } 
         },
    ],
    onMapMove:[
         {
             action: function(o, callback) {
-                console.log("Map moved:", o);
+                console.log("Map moved :", o);
+                console.log("Map moved to bounding box:", window.catex.utils.boundingBox(o.bounds));
             } 
         },
    ],
    onMousePoint:[
         {
             action: function(o, callback) {
-                console.log("Mouse moved to:", o);
+                console.log("Mouse moved :", o);
+                console.log("Mouse moved to:", window.catex.utils.pointToArray(o.point));
             } 
         },
    ]
@@ -295,7 +306,7 @@ function CSVToArray( strData: string, strDelimiter?: string ){
     strDelimiter = (strDelimiter || ",");
 
     // Create a regular expression to parse the CSV values.
-    var objPattern = new RegExp(
+    const objPattern = new RegExp(
         (
             // Delimiters.
             "(\\" + strDelimiter + "|\\r?\\n|\\r|^)" +
@@ -312,19 +323,20 @@ function CSVToArray( strData: string, strDelimiter?: string ){
 
     // Create an array to hold our data. Give the array
     // a default empty first row.
-    var arrData:any = [[]];
+    const arrData:any = [[]];
 
     // Create an array to hold our individual pattern
     // matching groups.
-    var arrMatches = null;
+    let arrMatches = null;
 
 
     // Keep looping over the regular expression matches
     // until we can no longer find a match.
+    // eslint-disable-next-line
     while (arrMatches = objPattern.exec( strData )){
 
         // Get the delimiter that was found.
-        var strMatchedDelimiter = arrMatches[ 1 ];
+        const strMatchedDelimiter = arrMatches[ 1 ];
 
         // Check to see if the given delimiter has a length
         // (is not the start of string) and if it matches
@@ -341,7 +353,7 @@ function CSVToArray( strData: string, strDelimiter?: string ){
 
         }
 
-        var strMatchedValue;
+        let strMatchedValue;
 
         // Now that we have our delimiter out of the way,
         // let's check to see which kind of value we
@@ -371,7 +383,6 @@ function CSVToArray( strData: string, strDelimiter?: string ){
     // Return the parsed data.
     return( arrData );
 }
-
 function localDatasets(query: {pageNumber: number, pageSize: number, search: string}) {
     const rows = [
         {
@@ -388,13 +399,6 @@ function localDatasets(query: {pageNumber: number, pageSize: number, search: str
             type: "MESH",
             endpoint: "https://sampledata.luciad.com/data/ogc3dtiles/LucerneAirborneMesh/tileset.json",
         },        
-        {
-            id: "2",
-            label: "Europe Cities",
-            title: "3D Tiles",
-            type: "CSV",
-            command: CommandOpenCSV,
-        },
     ]
     const matches = rows.filter(r=>r.label.toLowerCase().indexOf(query.search.toLowerCase())!==-1);
     const pageNumber = Number(query.pageNumber);
@@ -519,6 +523,25 @@ const SampleCommand = {
         "format": "GeoJSON",
         "crs": "CRS:84",
         "swapAxes": false,
+        "credentials": false,
+        "requestHeaders": {}
+      }
+    }
+  }
+
+  const CommandOpenKML = {
+    "action": 10,
+    "parameters": {
+      "action": "KMLLayer",
+      "autozoom": true,
+      "layer": {
+        "label": "luciad.kml",
+        "selectable": true,
+        "editable": false,
+      },
+      "model": {
+        "url": "http://localhost:5000/kml/luciad.kml",
+        "beforeProxy": "http://localhost:5000/kml/luciad.kml",
         "credentials": false,
         "requestHeaders": {}
       }
